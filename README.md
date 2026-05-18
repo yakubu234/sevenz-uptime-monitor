@@ -53,8 +53,6 @@ The default alert mailbox is:
 UPTIME_ALERT_EMAIL=alerts@example.com
 ```
 
-## Docker Setup
-
 ## Prerequisites
 
 - Docker Desktop installed
