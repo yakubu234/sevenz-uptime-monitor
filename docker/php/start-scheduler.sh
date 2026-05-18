@@ -4,6 +4,8 @@ set -e
 
 cd /var/www/html
 
+git config --global --add safe.directory /var/www/html || true
+
 if [ ! -f .env ]; then
     cp .env.example .env
 fi
