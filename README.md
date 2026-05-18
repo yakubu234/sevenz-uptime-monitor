@@ -18,13 +18,13 @@ This repository contains a Dockerized Laravel uptime monitor API for the Sevenz 
 
 ## Runtime Stack
 
-The app is meant to run in Docker, not on the host PHP installation.
+The project supports both Docker-based and local host execution.
 
 - `app` service: PHP `8.4` container running the Laravel app
 - `scheduler` service: PHP `8.4` container running `php artisan schedule:work`
 - `mysql` service: MySQL `8.4`
 
-This avoids local PHP version drift and keeps the assessment aligned with the stated requirements.
+Docker keeps the runtime aligned with the assessment requirements, while the app can also be run locally after configuring PHP, Composer, and MySQL access.
 
 ## Project Structure
 
@@ -138,10 +138,32 @@ php artisan migrate
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
+6. Run the monitor checks manually when you want to process uptime results:
+
+```bash
+php artisan app:check-monitors
+```
+
+7. If you want periodic checks locally, run the scheduler in a separate terminal:
+
+```bash
+php artisan schedule:work
+```
+
 The API will then be available at:
 
 ```text
 http://localhost:8000
+```
+
+Useful local commands:
+
+```bash
+php artisan migrate
+php artisan app:check-monitors
+php artisan schedule:work
+php artisan test
+php artisan tinker
 ```
 
 ## Useful Commands
