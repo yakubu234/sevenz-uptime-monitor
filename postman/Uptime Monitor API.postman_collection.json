@@ -1,0 +1,280 @@
+{
+  "info": {
+    "_postman_id": "2d32979c-7bcf-4b40-9d1d-uptime-monitor-api",
+    "name": "Uptime Monitor API",
+    "description": "Postman collection for testing the Uptime Monitor Laravel API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000"
+    },
+    {
+      "key": "monitorUrl",
+      "value": "https://example.com"
+    },
+    {
+      "key": "monitorId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Monitors",
+      "item": [
+        {
+          "name": "Create Monitor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Response contains monitor data', function () {",
+                  "    pm.expect(json).to.have.property('data');",
+                  "    pm.expect(json.data).to.have.property('id');",
+                  "    pm.expect(json.data).to.have.property('url');",
+                  "    pm.expect(json.data).to.have.property('status');",
+                  "});",
+                  "",
+                  "if (json.data && json.data.id) {",
+                  "    pm.collectionVariables.set('monitorId', json.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"{{monitorUrl}}\",\n  \"check_interval\": 5,\n  \"threshold\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/monitors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitors"
+              ]
+            },
+            "description": "Registers a new URL to monitor. The returned monitor id is saved into the collection variable `monitorId`."
+          },
+          "response": []
+        },
+        {
+          "name": "List Monitors",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Response contains data array', function () {",
+                  "    pm.expect(json).to.have.property('data');",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitors"
+              ]
+            },
+            "description": "Returns all monitors with current status and uptime percentage."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Monitor History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Response contains data and meta', function () {",
+                  "    pm.expect(json).to.have.property('data');",
+                  "    pm.expect(json.data).to.be.an('array');",
+                  "    pm.expect(json).to.have.property('meta');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitors/{{monitorId}}/history?per_page=15&page=1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitors",
+                "{{monitorId}}",
+                "history"
+              ],
+              "query": [
+                {
+                  "key": "per_page",
+                  "value": "15"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            },
+            "description": "Returns paginated history for the selected monitor."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Missing Monitor History",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Response contains not found message', function () {",
+                  "    pm.expect(json.message).to.eql('Monitor not found.');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/monitors/999999/history",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitors",
+                "999999",
+                "history"
+              ]
+            },
+            "description": "Negative test for the required custom 404 response."
+          },
+          "response": []
+        },
+        {
+          "name": "Create Duplicate Monitor",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 422', function () {",
+                  "    pm.response.to.have.status(422);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.test('Response contains url validation error', function () {",
+                  "    pm.expect(json).to.have.property('errors');",
+                  "    pm.expect(json.errors).to.have.property('url');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"url\": \"{{monitorUrl}}\",\n  \"check_interval\": 5,\n  \"threshold\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/monitors",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "monitors"
+              ]
+            },
+            "description": "Negative test for duplicate URL validation. Run after creating the first monitor."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
